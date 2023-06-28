@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="utf-8">
+	<title>JavaScript</title>
+	<link rel="stylesheet" href="css/nice-select2.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+	<h1>La communauté de l'anneau <button id="add">Ajouter un personnage</button></h1>
+	<form id="form" class="hide" data-mode="add">
+		<h3>Ajouter un membre</h3>
+		<div>
+			<label for="">Nom :</label>
+			<input type="text" placeholder="Nom du personnage" id="name">
+		</div>
+		<div>
+			<label for="">Photo :</label>
+			<input type="text" placeholder="url de l'image" id="img">
+		</div>
+		<div>
+			<label for="">Peuple :</label><br>
+			<select name="" id="people" class="wide">
+				<optgroup label="Elfes">
+					<option value="Haut-Elfe">Haut-Elfe</option>
+					<option value="Elfe sylvain">Elfe sylvain</option>
+					<option value="Demi Elfe">Demi-elfe</option>
+				</optgroup>
+				<optgroup label="Hommes">
+					<option value="Dunedain">Dunedain</option>
+					<option value="Rohirrim">Rohirrim</option>
+				</optgroup>
+				<optgroup label="autre">
+					<option value="Hobbit">Hobbit</option>
+					<option value="Nains">Nains</option>
+				</optgroup>
+			</select>
+		</div>
+		<div>
+			<p>Armes : </p>
+			<input type="checkbox" name="weapon[]" id="couteau" value="couteau"><label for="couteau"><img
+					src="img/icons/weapon/couteau.svg"></label>
+			<input type="checkbox" name="weapon[]" id="arc" value="arc"><label for="arc"><img
+					src="img/icons/weapon/arc.svg"></label>
+			<input type="checkbox" name="weapon[]" id="epee" value="epee"><label for="epee"><img
+					src="img/icons/weapon/epee.svg"></label>
+			<input type="checkbox" name="weapon[]" id="hache" value="hache"><label for="hache"><img
+					src="img/icons/weapon/hache.svg"></label>
+		</div>
+		<div>
+			<input type="submit" value="Enregistrer">
+		</div>
+	</form>
+
+	<ul id="team">
+		<!-- affiche la liste de tous les personnages -->
+
+	</ul>
+
+	<!-- affiche le détail d'un personnage -->
+	<section id="perso" class="out">
+		<img src="img/icons/e-remove.svg" title="Fermer">
+		<article>
+			<img src="img/persos/frodon.jpeg" alt="">
+			<div>
+				<h3>Nom</h3>
+				<small>Peuple</small>
+				<ul>
+					<h5>Armes :</h5>
+					<!-- liste des armes -->
+				</ul>
+			</div>
+		</article>
+		<div class="buttons">
+			<button id="edit">Modifier</button>
+			<button id="delete">Supprimer</button>
+		</div>
+	</section>
+
+
+	<script src="js/nice-select2.js"></script>
+	<script src="js/main.js" type="module" defer></script>
+</body>
+
+</html>
