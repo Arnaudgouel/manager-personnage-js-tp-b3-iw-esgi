@@ -1,4 +1,19 @@
+const addPerso = document.querySelector('#add');
+const deletePerso = document.querySelector('#delete');
+const editPerso = document.querySelector('#edit');
+const team = document.querySelector('#team');
+const form = document.querySelector('#form');
+const persoSection = document.querySelector('#perso');
+const persoName = document.querySelector('#perso h3');
+const persoImg = document.querySelector('#perso article img');
+const persoPopulace = document.querySelector('#perso small');
+const persoWeapons = document.querySelector('#perso ul');
+let selectedPerso = null;
 
+const formName = document.querySelector('#name');
+const formImg = document.querySelector('#img');
+const formPopulace = document.querySelector('#people');
+const weaponsInput = document.querySelectorAll('input[name="weapon[]"]');
 class Personnage {
   
   name;
@@ -47,60 +62,77 @@ class Personnage {
   setWeapons(weapons) {
     this.weapons = weapons;
   }
+
+  renderPerso() {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <img src="${this.getImg()}" alt="${this.getName()}">
+      <h3>${this.getName()}</h3>
+      <p>${this.getPopulace()}</p>
+    `;
+    li.addEventListener('click', () => {
+      selectedPerso = this;
+      this.displayPersoDetails();
+      persoSection.classList.remove('out');
+    });
+    team.appendChild(li);
+  }
+
+  displayPersoDetails() {
+    persoName.textContent = this.getName();
+    persoImg.src = this.getImg();
+    persoPopulace.textContent = this.getPopulace();
+    persoWeapons.innerHTML = '';
+    this.getWeapons().forEach((weapon) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <img src="${weapon.img}" alt="${weapon.name}">
+        <h3>${weapon.name}</h3>
+      `;
+      persoWeapons.appendChild(li);
+    });
+  }
+
+  editPerso() {
+    form.classList.remove('hide');
+    persoSection.classList.add('out');
+    form.dataset.mode = 'edit';
+    formName.value = this.getName();
+    formImg.value = this.getImg();
+    formPopulace.value = this.getPopulace();
+    weaponsInput.forEach((weapon) => {
+      weapon.checked = false;
+    });
+    this.getWeapons().forEach((weapon) => {
+      const input = document.querySelector(`input[value="${weapon.name}"]`);
+      input.checked = true;
+    });
+  }
 }
 
 
-const addPerso = document.querySelector('#add');
-const deletePerso = document.querySelector('#delete');
-const editPerso = document.querySelector('#edit');
-const team = document.querySelector('#team');
-const form = document.querySelector('#form');
-const persoSection = document.querySelector('#perso');
-const persoName = document.querySelector('#perso h3');
-const persoImg = document.querySelector('#perso article img');
-const persoPopulace = document.querySelector('#perso small');
-const persoWeapons = document.querySelector('#perso ul');
-let selectedPerso = null;
 
 let persos = [];
 
 if (localStorage.getItem('persos')) {
   persos = JSON.parse(localStorage.getItem('persos'));
+  let tempPersos = [];
+  persos.forEach((perso) => {
+    tempPersos.push(new Personnage(perso.name, perso.img, perso.populace, perso.weapons));
+  });
+  persos = tempPersos;
   renderPersos();
 }
 
 function renderPersos(){
   team.innerHTML = '';
   persos.forEach((perso) => {
-    console.log(perso);
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <img src="${perso.img}" alt="${perso.name}">
-      <h3>${perso.name}</h3>
-      <p>${perso.populace}</p>
-    `;
-    li.addEventListener('click', () => {
-      selectedPerso = perso;
-      displayPersoDetails();
-      persoSection.classList.remove('out');
-    });
-    team.appendChild(li);
+    perso.renderPerso();
   });
 }
 
 function displayPersoDetails() {
-  persoName.textContent = selectedPerso.name;
-  persoImg.src = selectedPerso.img;
-  persoPopulace.textContent = selectedPerso.populace;
-  persoWeapons.innerHTML = '';
-  selectedPerso.weapons.forEach((weapon) => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <img src="${weapon.img}" alt="${weapon.name}">
-      <h3>${weapon.name}</h3>
-    `;
-    persoWeapons.appendChild(li);
-  });
+  selectedPerso.displayPersoDetails();
 }
 
 addPerso.addEventListener('click', () => {
@@ -109,10 +141,6 @@ addPerso.addEventListener('click', () => {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const name = document.querySelector('#name').value;
-  const img = document.querySelector('#img').value;
-  const populace = document.querySelector('#people').value;
-  const weaponsInput = document.querySelectorAll('input[name="weapon[]"]');
   let weapons = [];
   weaponsInput.forEach((weapon) => {
     if (!weapon.checked) {
@@ -122,16 +150,17 @@ form.addEventListener('submit', (e) => {
       name: weapon.value,
       img: weapon.nextSibling.firstChild.src,
     });
-    console.log(weapon.nextSibling);
   });
-  const newPerso = new Personnage(name, img, populace, weapons);
   if (form.dataset.mode === 'edit') {
     const index = persos.indexOf(selectedPerso);
-    persos[index] = newPerso;
+    persos[index].setName(formName.value);
+    persos[index].setImg(formImg.value);
+    persos[index].setPopulace(formPopulace.value);
+    persos[index].setWeapons(weapons);
   } else {
+    const newPerso = new Personnage(formName.value, formImg.value, formPopulace.value, weapons);
     persos.push(newPerso);
   }
-  console.log(persos);
   form.classList.add('hide');
   form.reset();
   form.dataset.mode = 'add';
@@ -155,20 +184,7 @@ deletePerso.addEventListener('click', () => {
 
 editPerso.addEventListener('click', () => {
   if (selectedPerso) {
-    persoSection.classList.add('out');
-    form.classList.remove('hide');
-    form.dataset.mode = 'edit';
-    document.querySelector('#name').value = selectedPerso.name;
-    document.querySelector('#img').value = selectedPerso.img;
-    document.querySelector('#people').value = selectedPerso.populace;
-    const weaponsInput = document.querySelectorAll('input[name="weapon[]"]');
-    weaponsInput.forEach((weapon) => {
-      weapon.checked = false;
-    });
-    selectedPerso.weapons.forEach((weapon) => {
-      const input = document.querySelector(`input[value="${weapon.name}"]`);
-      input.checked = true;
-    });
+    selectedPerso.editPerso();
   }
 });
 
